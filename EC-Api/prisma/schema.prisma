@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id           Int                   @id @default(autoincrement())
+  name         String
+  email        String
+  phone        String
+  teachingInfo TeacherTeachingInfo[]
+  honar        Teacher_Honar[]
+}
+
+model Subject {
+  id          Int                 @id @default(autoincrement())
+  rateId      Int
+  name        String
+  NumOFRate   NumOfStudentPerRate @relation(fields: [rateId], references: [id])
+  subjectinfo SubjectInfo[]
+}
+
+model SubjectInfo {
+  id           Int                   @id @unique @default(autoincrement())
+  rateId       Int
+  serieId      Int
+  subId        Int
+  NumStudent   Int
+  paymentRates PaymentRate[]
+  NumOFRate    NumOfStudentPerRate   @relation(fields: [rateId], references: [id])
+  serie        Serie                 @relation(fields: [serieId], references: [id])
+  subject      Subject               @relation(fields: [subId], references: [id])
+  teachingInfo TeacherTeachingInfo[]
+}
+
+model Serie {
+  id       Int                   @id @default(autoincrement())
+  Series   String
+  payRate  PaymentRate[]
+  subject  SubjectInfo[]
+  TeaTinfo TeacherTeachingInfo[]
+}
+
+model TeacherTeachingInfo {
+  id          Int         @id @default(autoincrement())
+  subjectId   Int
+  teacherId   Int
+  serieId     Int
+  timeIn      Int
+  timeOut     Int
+  duration    Int
+  course      String
+  session     String
+  dateOfTeach DateTime
+  createDate  DateTime    @default(now())
+  payments    Payment[]
+  teacher     Teacher     @relation(fields: [teacherId], references: [id])
+  subjectinfo SubjectInfo @relation(fields: [subjectId], references: [id])
+  series      Serie       @relation(fields: [serieId], references: [id])
+}
+
+model Payment {
+  id           Int                 @id @default(autoincrement())
+  teainfoId    Int
+  payment      Int
+  amount       Decimal
+  present      Decimal 
+  status       String
+  createdAt    DateTime            @default(now())
+  teachingInfo TeacherTeachingInfo @relation(fields: [teainfoId], references: [id])
+}
+
+model NumOfStudentPerRate {
+  id            Int           @id @default(autoincrement())
+  part          Int
+  underNine     Int?
+  underfourteen Int?
+  underTwenty   Int?
+  underFourty   Int?
+  underSixty    Int?
+  underEighty   Int?
+  underHundered Int?
+  subject       Subject[]
+  subjectinfo   SubjectInfo[]
+}
+
+model PaymentRate {
+  id            Int         @id @default(autoincrement())
+  subjectinfoId Int
+  serieId       Int
+  rate          Int
+  subjectinfo   SubjectInfo @relation(fields: [subjectinfoId], references: [id])
+  serie         Serie       @relation(fields: [serieId], references: [id])
+}
+	
+model Teacher_Honar {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  Honar     Int
+  Date      DateTime
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+}
